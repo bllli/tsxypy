@@ -7,7 +7,7 @@ tsxyScore是一个青果教务系统非官方查分Web API
 ####requests
 ## usage
 ####start
-  usage --http :9001 -w webapi
+  uwsig --http :9001 -w webapi
 ####post
 #####post url
   http:120.0.0.1:9001/weix/
