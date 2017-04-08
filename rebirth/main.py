@@ -169,11 +169,10 @@ class Student(object):
         except IndexError:
             raise RuntimeError('user_code error')
 
-        def yield_elem(tr):
-            for td in tr:
+        def yield_elem(trs):
+            for td in trs:
                 if td.string == '\n':
                     continue
-                # print(type(td), type(td.string), len(td.string), td.string)
                 yield td.string
 
         all_course = []
