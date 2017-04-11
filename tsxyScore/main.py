@@ -8,8 +8,8 @@ from datetime import datetime
 from PIL import Image
 import json
 
-from rebirth.config import Config
-from rebirth.tools import md5password, rand_ok, save_cookies, load_cookies
+from tsxyScore.config import Config
+from tsxyScore.tools import md5password, rand_ok, save_cookies, load_cookies
 
 
 GMT_FORMAT = '%a %b %d %Y %H:%M:%S GMT+0800 (CST)'
@@ -202,6 +202,18 @@ class Student(object):
             'grade': grade,
             'scores': all_course,
         })
+
+
+def is_tsxy_stu(stu, pwd):
+    try:
+        int(stu)
+    except ValueError:
+        raise ValueError('学号应该是一个十位数或是九位数.')
+    if len(stu) not in [9, 10]:
+        raise ValueError('学号应该是一个十位数或是九位数.')
+    stu = Student(stu=stu, pwd=pwd, use_cookies=False)
+    stu.login()
+    return stu.get_user_code()
 
 
 if __name__ == "__main__":
