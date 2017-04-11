@@ -97,3 +97,4 @@ ENV/
 
 .idea/
 tsxyScore/cookies
+py3.4venv/
