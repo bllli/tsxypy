@@ -19,4 +19,8 @@ import tsxyScore
 tsxyScore.is_tsxy_stu('1234567890', 'password')
 ```
 # 说明
-用到的包有几个坑, 等我~~自己安装~~有空的时候再单独写一下
+用到的包有几个坑, 等我 ~~自己安装~~ 有空的时候再单独写一下
+
+## 找不到tesseract
+安装好后，直接使用会提示错误 `FileNotFoundError: [Errno 2] No such file or directory: 'tesseract'`  
+Ubuntu中使用`sudo apt-get install tesseract-ocr`安装即可
