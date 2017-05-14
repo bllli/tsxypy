@@ -56,6 +56,6 @@ def load_cookies():
     try:
         with open(Config.cookies_file, 'rb') as f:
             cookies = requests.utils.cookiejar_from_dict(pickle.load(f))
-    except FileNotFoundError:
+    except IOError:
         return None
     return cookies

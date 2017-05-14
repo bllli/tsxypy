@@ -1,5 +1,7 @@
 # -*- coding: utf-8 -*-
+from __future__ import absolute_import, division, print_function, unicode_literals
 import re
+import sys
 import pytesseract
 import requests
 import bs4
@@ -14,6 +16,10 @@ from tsxyScore.tools import md5password, rand_ok, save_cookies, load_cookies
 
 GMT_FORMAT = '%a %b %d %Y %H:%M:%S GMT+0800 (CST)'
 # 这是校园网验证码页面url需要的日期格式 感谢 http://ju.outofmemory.cn/entry/1078
+if sys.version_info.major == 3:
+    unicode = str
+else:
+    bytes = str
 
 
 class Student(object):
@@ -118,7 +124,7 @@ class Student(object):
         r = re.compile('<p>This.+frames')
         return True if r.search(r2.text) else False
 
-    def get_score(self, user_code, score_type):
+    def get_score_html_page(self, user_code, score_type="new"):
         """
         提交表单获取分数页面HTML代码
         :param user_code: 用户代码
@@ -152,20 +158,20 @@ class Student(object):
         if 'login.action' in r.url:
             # 响应的url中含有logon时, 可以认为未登陆成功
             self.login()
-            return self.get_score(user_code, score_type)
+            return self.get_score_html_page(user_code, score_type)
         return r.text
 
-    def web_get(self, user_code, score_type='new'):
+    def get_user_score_json(self, user_code, score_type='all'):
         """
         获取整理过的分数数据
         """
-        html = self.get_score(user_code, score_type)
+        html = self.get_score_html_page(user_code, score_type)
         soup = bs4.BeautifulSoup(html, 'html.parser')
         try:
-            department = soup.find_all('div')[3].string.split('：')[1]
-            grade = soup.find_all('div')[4].string.split('：')[1]
-            stu_id = soup.find_all('div')[5].string.split('：')[1]
-            stu_name = soup.find_all('div')[6].string.split('：')[1]
+            department = soup.find_all('div')[3].string.split(u'：')[1]
+            grade = soup.find_all('div')[4].string.split(u'：')[1]
+            stu_id = soup.find_all('div')[5].string.split(u'：')[1]
+            stu_name = soup.find_all('div')[6].string.split(u'：')[1]
         except IndexError:
             raise RuntimeError('user_code error')
 
@@ -195,25 +201,13 @@ class Student(object):
                 '备注': next_elem.send(None),
             }
             all_course.append(single_course)
-        return json.dumps({
+        return {
             'student_name': stu_name,
             'student_id': stu_id,
             'department': department,
             'grade': grade,
             'scores': all_course,
-        })
-
-
-def is_tsxy_stu(stu, pwd):
-    try:
-        int(stu)
-    except ValueError:
-        raise ValueError('学号应该是一个十位数或是九位数.')
-    if len(stu) not in [9, 10]:
-        raise ValueError('学号应该是一个十位数或是九位数.')
-    stu = Student(stu=stu, pwd=pwd, use_cookies=False)
-    stu.login()
-    return stu.get_user_code()
+        }
 
 
 if __name__ == "__main__":
@@ -222,4 +216,4 @@ if __name__ == "__main__":
     li.login()
     userCode = li.get_user_code()
     print(userCode)
-    print(li.web_get(userCode))
+    print(li.get_user_score_json(userCode))
