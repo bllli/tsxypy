@@ -49,13 +49,13 @@ def rand_ok(rand_text):
 
 def save_cookies(cookies):
     with open(Config.cookies_file, 'wb') as f:
-        pickle.dump(requests.utils.dict_from_cookiejar(cookies), f)
+        pickle.dump(requests.utils.dict_from_cookiejar(cookies), f, protocol=2)
 
 
 def load_cookies():
     try:
         with open(Config.cookies_file, 'rb') as f:
             cookies = requests.utils.cookiejar_from_dict(pickle.load(f))
-    except IOError:
+    except (IOError, ValueError):
         return None
     return cookies
