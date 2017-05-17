@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 from tsxyScore.config import Config
-from tsxyScore.main import Student
+from tsxyScore.main import Student, Syllabus
 
 
 def is_tsxy_stu(stu, pwd):

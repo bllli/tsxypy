@@ -61,7 +61,10 @@ class Student(object):
                 # 无须使用本地写权限/不会留下多余的验证码文件
                 # thank to http://stackoverflow.com/questions/31064981/python3-error-initial-value-must-be-str-or-none
                 from io import BytesIO
-                im = Image.open(BytesIO(img.content))
+                dataBytesIO = BytesIO(img.content)
+                dataBytesIO.seek(0)
+                im = Image.open(dataBytesIO)
+                # thanks to http://stackoverflow.com/questions/31077366/pil-cannot-identify-image-file-for-io-bytesio-object
                 text = pytesseract.image_to_string(im)  # 识别图像
             return text
 
@@ -357,26 +360,64 @@ class Syllabus(Student):
     def print_all(self):
         """
         用来获取班级代码与班级名称的对应关系
+        按现在抓取的数据分析来看, 各个年级的院系部代码和专业代码都是不变的.
+        但为稳妥起见(以防抽风改成不一致), 仍按照教务系统原有的从年份开始设计json.
+        学校-年份-系别(院系部)-专业-班级.
+        classes = {'name': '14计本1', 'code': '2014020601'}
+        specialty = {'name': '计算机专业与技术', 'code': '4001', 'classes': [c1, c2...]}
+        department = {'name': '计算机专业与技术系', 'code': '40', 'specialties': [s1, s2...]}
+        school_year = {'year': '2014', 'departments': [department1, department2...]}
+        school = {'school_years': [school_year1, school_year2...]}
+        差不多就是这样
         :return: 
         """
         for school_area in self.get_school_area():
             print("%s %s" % (school_area['code'], school_area['name']))
-
+        school_years = []
         for year in ['2013', '2014', '2015', '2016']:
             print(year)
             yxbs = self.get_yxb(year)
             if not yxbs:
                 continue
+            departments = []
             for yxb in yxbs:
                 print("%s %s" % (yxb['code'], yxb['name']))
+
                 specialtys = self.get_specialty(year, yxb['code'])
                 if not specialtys:
                     continue
+                specialties_json = []
                 for specialty in specialtys:
                     print("--%s %s" % (specialty['code'], specialty['name']))
-                    _classs = self.get_class(year, yxb['code'], specialty['code'])
-                    for _class in _classs:
+                    _classes = self.get_class(year, yxb['code'], specialty['code'])
+                    _classes_json = []
+                    for _class in _classes:
                         print("----%s %s" % (_class['code'], _class['name']))
+                        _class_json = {
+                            'name': _class['name'].split(']')[1],
+                            'code': _class['code'],
+                        }
+                        _classes_json.append(_class_json)
+                    specialty_json = {
+                        'name': specialty['name'].split(']')[1],
+                        'code': specialty['code'],
+                        'classes': _classes_json,
+                    }
+                    specialties_json.append(specialty_json)
+                department = {
+                    'name': yxb['name'].split(']')[1],
+                    'code': yxb['code'],
+                    'specialties':specialties_json,
+                }
+                departments.append(department)
+            school_year = {
+                'year': year,
+                'departments': departments,
+            }
+            school_years.append(school_year)
+        return {
+            'school_years': school_years,
+        }
 
 
 if __name__ == "__main__":
@@ -388,6 +429,6 @@ if __name__ == "__main__":
     # print(li.get_user_score_json(userCode))
     li = Syllabus()
     li.login()
-    # li.print_all()
+    print(json.dumps(li.print_all()))
 
-    print(json.dumps(li.get_syllabus('2015020601', 2016, '1')))
+    # print(json.dumps(li.get_syllabus('2015020601', 2016, '1')))
