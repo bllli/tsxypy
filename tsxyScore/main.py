@@ -279,7 +279,10 @@ class Syllabus(Student):
         courses = []
         soup = bs4.BeautifulSoup(r.text, 'html.parser')
         class_info = []
-        for s in soup.find('div', {'group': 'group'}).stripped_strings:
+        raw_class_info = soup.find('div', {'group': 'group'})
+        if not raw_class_info:
+            raise RuntimeError("没有课表!")
+        for s in raw_class_info.stripped_strings:
             class_info.append(s.split('：')[-1])
         # 获取课程表前的班级信息 按顺序分别是 系别/年级/专业/班级
         for div in soup.find_all('div', 'div1'):
