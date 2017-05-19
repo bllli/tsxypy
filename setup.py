@@ -1,7 +1,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name='tsxyScore',
+    name='tsxypy',
     version='0.0.1',
     keywords=('Python3', 'TSXY'),
     description='',

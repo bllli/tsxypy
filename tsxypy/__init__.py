@@ -1,7 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
-from tsxyScore.config import Config
-from tsxyScore.main import Student, Syllabus
+from tsxypy.config import Config
+from tsxypy.SchoolSystem import SchoolSystem
+from tsxypy.ScoreCatcher import ScoreCatcher
+from tsxypy.ScheduleCatcher import ScheduleCatcher
 
 
 def is_tsxy_stu(stu, pwd):
@@ -18,7 +20,7 @@ def is_tsxy_stu(stu, pwd):
         raise ValueError('学号应该是一个十位数或是九位数.')
     if len(stu) not in [9, 10]:
         raise ValueError('学号应该是一个十位数或是九位数.')
-    stu = Student(stu=stu, pwd=pwd, use_cookies=False)
+    stu = SchoolSystem(stu=stu, pwd=pwd, use_cookies=False)
     stu.login()
     return stu.get_user_code()
 
@@ -29,7 +31,7 @@ def get_user_info_by_user_code(user_code):
     :param user_code: 用户代码 在教务系统中用于定义唯一用户 
     :return: 用户信息字典 
     """
-    stu = Student(stu=Config.student_id, pwd=Config.password)
+    stu = ScoreCatcher(stu=Config.student_id, pwd=Config.password)
     stu.login()
     if user_code:
         stu_info = stu.get_user_score_json(user_code)
@@ -47,4 +49,4 @@ def get_user_info_by_password(stu, pwd):
     :return: 用户信息字典
     """
     user_code = is_tsxy_stu(stu, pwd)
-    return get_user_info_by_user_code(user_code)
+    return json.dumps(get_user_info_by_user_code(user_code))
