@@ -102,5 +102,4 @@ cookies
 .pypirc
 
 # 避免泄露密码
-tsxypy/config.py
 demo.py
