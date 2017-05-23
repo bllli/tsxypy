@@ -20,7 +20,9 @@ Linux: `$ vim ~/.bashrc` 文件尾部追加
 export STU_ID=0000000000
 export STU_PWD=yourpassword
 ```
-Windows:![尴尬而不失礼貌的微笑](http://wx2.sinaimg.cn/large/005XSXmNgy1fdven80q9wj30k00j4q4i.jpg)
+Windows:
+
+![尴尬而不失礼貌的微笑](http://wx2.sinaimg.cn/large/005XSXmNgy1fdven80q9wj30k00j4q4i.jpg)
 ## 使用
 ### 学号密码验证
 ```Python
