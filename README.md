@@ -22,6 +22,8 @@ export STU_PWD=yourpassword
 ```
 Windows:
 
+[搜索:windows环境变量](https://www.baidu.com/s?wd=windows%E7%8E%AF%E5%A2%83%E5%8F%98%E9%87%8F)
+
 ![尴尬而不失礼貌的微笑](http://wx2.sinaimg.cn/large/005XSXmNgy1fdven80q9wj30k00j4q4i.jpg)
 ## 使用
 ### 学号密码验证
