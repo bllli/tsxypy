@@ -2,7 +2,7 @@
 # 为了使实现主要功能的文件更加清爽, 特将几个不涉及对象的工具函数单独提出
 import pickle
 import requests
-from .config import Config
+from .Config import Config
 
 
 def md5password(password, rand_number):
@@ -49,7 +49,7 @@ def rand_ok(rand_text):
 
 def save_cookies(cookies):
     with open(Config.cookies_file, 'wb') as f:
-        pickle.dump(requests.utils.dict_from_cookiejar(cookies), f, protocol=2)
+        pickle.dump(requests.utils.dict_from_cookiejar(cookies), f)
 
 
 def load_cookies():

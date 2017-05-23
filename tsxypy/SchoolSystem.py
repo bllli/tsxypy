@@ -10,8 +10,8 @@ import pytesseract
 from datetime import datetime
 from PIL import Image
 
-from tsxypy.config import Config
-from tsxypy.tools import md5password, rand_ok, save_cookies, load_cookies
+from tsxypy.Config import Config
+from tsxypy.Tools import md5password, rand_ok, save_cookies, load_cookies
 
 
 class SchoolSystem:
@@ -27,10 +27,7 @@ class SchoolSystem:
         self._pwd = pwd
 
         self.headers = {
-            'Host': 'jiaowu.tsc.edu.cn',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 6.3; Win64; x64; rv:47.0) Gecko/20100101 Firefox/47.0',
             'Referer': 'http://jiaowu.tsc.edu.cn/tscjw/cas/login.action',
-            'Connection': 'keep-alive',
         }
         if use_cookies:
             self.cookies_login()
@@ -81,6 +78,7 @@ class SchoolSystem:
             self.login()
         elif status == '402':
             raise RuntimeError('402, 账号或密码错误')
+        save_cookies(self._session.cookies)
 
     def cookies_login(self):
         """
@@ -129,8 +127,11 @@ if __name__ == "__main__":
     # userCode = li.get_user_code()
     # print(userCode)
     # print(li.get_user_score_json(userCode))
-    li = Syllabus()
-    li.login()
-    print(json.dumps(li.print_all()))
 
+    import os
+    print(os.environ.get('STU_ID'))
+    li = SchoolSystem(stu=Config.student_id, pwd=Config.password)
+    li.login()
+    print('-------')
+    print(li.get_user_code())
     # print(json.dumps(li.get_syllabus('2015020601', 2016, '1')))

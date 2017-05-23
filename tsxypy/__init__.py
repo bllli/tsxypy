@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
-from tsxypy.config import Config
+from tsxypy.Config import Config
 from tsxypy.SchoolSystem import SchoolSystem
 from tsxypy.ScoreCatcher import ScoreCatcher
 from tsxypy.ScheduleCatcher import ScheduleCatcher

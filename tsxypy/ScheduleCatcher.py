@@ -6,7 +6,7 @@ import sys
 import bs4
 
 from tsxypy.SchoolSystem import SchoolSystem
-from tsxypy.config import Config
+from tsxypy.Config import Config
 
 
 class ScheduleCatcher(SchoolSystem):
