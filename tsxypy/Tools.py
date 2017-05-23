@@ -59,3 +59,31 @@ def load_cookies():
     except (IOError, ValueError):
         return None
     return cookies
+
+
+def week_info_to_week_list(week_info, parity):
+    """
+    那几周上课
+    :param week_info: 上课周次信息
+    :param parity: 单双周
+    逗号分隔
+    横线指[A-B]
+    :return:
+    """
+    if week_info is None:
+        return []
+    week_info = week_info.strip(u"周").strip(u'[').strip(u']')
+    week = []
+    for one in week_info.split(u','):
+        if '-' in one:
+            range_param = one.split(u'-')
+            for a in range(int(range_param[0]), int(range_param[1]) + 1):
+                week.append(a)
+        else:
+            week.append(int(one))
+    if parity:
+        p = 0 if parity == u'双周' else 1
+        for w in week:
+            if w % 2 != p:
+                week.remove(w)
+    return week

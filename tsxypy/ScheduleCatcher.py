@@ -7,6 +7,7 @@ import bs4
 
 from tsxypy.SchoolSystem import SchoolSystem
 from tsxypy.Config import Config
+from tsxypy.Tools import week_info_to_week_list
 
 
 class ScheduleCatcher(SchoolSystem):
@@ -14,7 +15,7 @@ class ScheduleCatcher(SchoolSystem):
     课程表 目前只抓取教务系统中的课程表
     """
     def __init__(self):
-        super(ScheduleCatcher, self).__init__(stu=Config.student_id, pwd=Config.password, use_cookies=True)
+        SchoolSystem.__init__(self, stu=Config.student_id, pwd=Config.password, use_cookies=True)
 
     def _get_drop_lists(self, data, err_info):
         url = 'http://jiaowu.tsc.edu.cn/tscjw/frame/droplist/getDropLists.action'
@@ -135,9 +136,10 @@ class ScheduleCatcher(SchoolSystem):
                     'name': name,
                     'worth': worth,
                     'teacher': teacher,
-                    'week': week,
+                    'week': week_info_to_week_list(week, parity),
+                    'week_raw': week,
                     'parity': parity,
-                    'which_room':which_room,
+                    'which_room': which_room,
                     'where': where,
                 }
                 # print(course_dict)
