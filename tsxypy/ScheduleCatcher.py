@@ -8,6 +8,7 @@ import bs4
 from tsxypy.SchoolSystem import SchoolSystem
 from tsxypy.Config import Config
 from tsxypy.Tools import week_info_to_week_list
+from tsxypy.Exception import NoneScheduleException, NetException
 
 
 class ScheduleCatcher(SchoolSystem):
@@ -23,7 +24,7 @@ class ScheduleCatcher(SchoolSystem):
         if r.status_code == 200:
             return json.loads(r.text)
         else:
-            raise RuntimeError(err_info)
+            raise NetException(err_info)
 
     def get_school_area(self):
         data = {
@@ -75,13 +76,13 @@ class ScheduleCatcher(SchoolSystem):
         }
         r = self._session.post(url=url, data=data, headers=self.headers)
         if not r.status_code == 200:
-            raise RuntimeError("课表获取失败!")
+            raise NetException("课表获取失败!")
         courses = []
         soup = bs4.BeautifulSoup(r.text, 'html.parser')
         class_info = []
         raw_class_info = soup.find('div', {'group': 'group'})
         if not raw_class_info:
-            raise RuntimeError("没有课表!")
+            raise NoneScheduleException("没有课表!")
         for s in raw_class_info.stripped_strings:
             class_info.append(s.split('：')[-1])
         # 获取课程表前的班级信息 按顺序分别是 系别/年级/专业/班级

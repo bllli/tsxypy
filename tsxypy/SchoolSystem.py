@@ -12,6 +12,7 @@ from PIL import Image
 
 from tsxypy.Config import Config
 from tsxypy.Tools import md5password, rand_ok, save_cookies, load_cookies
+from tsxypy.Exception import WrongPasswordException
 
 
 class SchoolSystem:
@@ -77,7 +78,7 @@ class SchoolSystem:
         if status == '401':
             self.login()
         elif status == '402':
-            raise RuntimeError('402, 账号或密码错误')
+            raise WrongPasswordException('402, 账号或密码错误')
         save_cookies(self._session.cookies)
 
     def cookies_login(self):

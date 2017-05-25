@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 from __future__ import absolute_import, division, print_function, unicode_literals
 from tsxypy.SchoolSystem import SchoolSystem
+from tsxypy.Exception import WrongUserCodeException
 import bs4
 
 
@@ -54,7 +55,7 @@ class ScoreCatcher(SchoolSystem):
             stu_id = soup.find_all('div')[5].string.split(u'：')[1]
             stu_name = soup.find_all('div')[6].string.split(u'：')[1]
         except IndexError:
-            raise RuntimeError('user_code error')
+            raise WrongUserCodeException('given user_code:%s' % user_code)
 
         def yield_elem(trs):
             for td in trs:
