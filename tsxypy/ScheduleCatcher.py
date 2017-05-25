@@ -14,6 +14,8 @@ from tsxypy.Exception import NoneScheduleException, NetException
 class ScheduleCatcher(SchoolSystem):
     """
     课程表 目前只抓取教务系统中的课程表
+    爬取全校教学安排表-班级课表
+    通过下拉列表获取学校结构及班级代码, 通过班级代码获取课程信息
     """
     def __init__(self):
         SchoolSystem.__init__(self, stu=Config.student_id, pwd=Config.password, use_cookies=True)
@@ -61,6 +63,13 @@ class ScheduleCatcher(SchoolSystem):
     def get_schedule(self, class_code, school_year, semester):
         """
         获取课程表
+        班级课表 格式一
+        课程表table的id确认上课时间(第几周第几节课), 解析单元格内字符串来获取课程信息.
+        注意字符串中是以全角字符空格分隔信息项的, 而具体有多少个信息项是不确定的.
+        我在本函数的课程字符串处理中描述了几种情况, 但体育课和网选课实在没有通用的逻辑...
+        所以我只解析体育课的上课时间, 并直接放弃解析含有网选课的单元格
+        但是这样的代码无法应对一个上课时间含有网选课和其他课的情况.
+        -决定放弃爬该接口, 此处代码留到下个版本再删-
         :param class_code: 班级代码
         :param school_year: 学年起始 四位数字 *注意不能是字符串* 如:2016-2017学年 应传入2016
         :param semester: '0': 上半学期 或 '1': 下半学期
@@ -206,7 +215,7 @@ class ScheduleCatcher(SchoolSystem):
                 department = {
                     'name': yxb['name'].split(']')[1],
                     'code': yxb['code'],
-                    'specialties':specialties_json,
+                    'specialties': specialties_json,
                 }
                 departments.append(department)
             school_year = {

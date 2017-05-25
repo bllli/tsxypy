@@ -10,6 +10,10 @@ from tsxypy.Tools import week_info_to_week_list
 
 
 class ScheduleCatcherTwo(SchoolSystem):
+    """
+    爬取全校教学安排表-学生课表
+    通过学号获取课程信息
+    """
     def __init__(self):
         SchoolSystem.__init__(self, stu=Config.student_id, pwd=Config.password, use_cookies=True)
 
