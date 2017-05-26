@@ -2,7 +2,8 @@
 # 为了使实现主要功能的文件更加清爽, 特将几个不涉及对象的工具函数单独提出
 import pickle
 import requests
-from .Config import Config
+from tsxypy.Config import Config
+from tsxypy.Exception import WrongScheduleException
 
 
 def md5password(password, rand_number):
@@ -87,3 +88,14 @@ def week_info_to_week_list(week_info, parity):
             if w % 2 != p:
                 week.remove(w)
     return week
+
+
+def translate(name):
+    d = {
+        u'毛泽东思想和中国特色社会主义理论体系概论': u'毛概',
+        u'数字电路与逻辑设计': u'数电',
+    }
+    for key in d:
+        if key in name:
+            return d[key]
+    return None

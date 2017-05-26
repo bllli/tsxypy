@@ -7,8 +7,8 @@ import bs4
 
 from tsxypy.SchoolSystem import SchoolSystem
 from tsxypy.Config import Config
-from tsxypy.Tools import week_info_to_week_list
-from tsxypy.Exception import NoneScheduleException, NetException
+from tsxypy.Tools import week_info_to_week_list, translate
+from tsxypy.Exception import NoneScheduleException, NetException, WrongScheduleException
 
 
 class ScheduleCatcher(SchoolSystem):
@@ -226,3 +226,114 @@ class ScheduleCatcher(SchoolSystem):
         return {
             'school_years': school_years,
         }
+
+    def get_schedule_form_two(self, class_code, school_year, semester):
+        """
+        获取课程表
+        班级课表 格式二
+        很开心的发现竟然还有一个格式二的接口可以爬
+        
+        :param class_code: 班级代码
+        :param school_year: 学年起始 四位数字 *注意不能是字符串* 如:2016-2017学年 应传入2016
+        :param semester: '0': 上半学期 或 '1': 下半学期
+        :return: 课程dict
+        """
+        url = 'http://jiaowu.tsc.edu.cn/tscjw/kbbp/dykb.bjkb_data.jsp'
+        data = {
+            'hidBJDM': class_code,  # 班级代码
+            'hidCXLX': 'fbj',  # 意思差不多是"分班级"
+            'xn': str(school_year),  # 学年 2016-2017学年
+            'xn1': str(school_year + 1),
+            'xq_m': semester,  # 学期 0为上学期; 1为下学期
+            'selGS': '2',
+            'radioa': '5',
+        }
+        r = self._session.post(url=url, data=data, headers=self.headers)
+        if not r.status_code == 200:
+            raise NetException("课表获取失败!")
+        courses = []
+        soup = bs4.BeautifulSoup(r.text, 'html.parser')
+        class_info = []
+        raw_class_info = soup.find('div', {'group': 'group'})
+        if not raw_class_info:
+            raise NoneScheduleException("没有课表!")
+        for s in raw_class_info.stripped_strings:
+            class_info.append(s)
+        raw_course_tables = soup.find_all('table')
+        upper = []
+        courses = []
+        for table in raw_course_tables:
+            for tr in table.find_all('tr'):
+                # print('--------')
+                if tr.td.string == '课程' or (tr.td.string is not None and '网选' in tr.td.string):
+                    # 筛去网选课和
+                    continue
+                single_course_info = []
+                for td in tr.find_all('td'):
+                    # 课程 学分 总学时 讲授学时 实验学时 实践学时 其它学时 考核方式 课程类别 教师 上课班号 上课人数 周次 单双周 节次 地点
+                    # print(td.string)
+
+                    single_course_info.append(td.string)
+
+                if single_course_info[0] is None:
+                    # 补全表格
+                    if len(upper) != len(single_course_info):
+                        raise WrongScheduleException('课表表单项不同, 无法解析:%s vs %s' % (upper, single_course_info))
+                    item_at = 0
+                    for one in single_course_info:
+                        if one is None:
+                            single_course_info[item_at] = upper[item_at]
+                        item_at += 1
+                else:
+                    # print("Set upper success")
+                    upper = list(single_course_info)
+                # print(single_course_info)
+                course_when = single_course_info[14]
+                c = course_when.split('[')[1].strip(']')  # 上课节次
+                when_code_dict = {
+                    '1-2节': [1],
+                    '3-4节': [2],
+                    '5-6节': [3],
+                    '7-8节': [4],
+                    '9-10节': [5],
+                    # 一大节变两小节
+                    '1-4节': [1, 2],
+                    '5-8节': [3, 4],
+                }
+                try:
+                    course_times = when_code_dict[c]
+                except KeyError:
+                    raise WrongScheduleException('无法识别部分课程!节次代码错误!')
+                for course_time in course_times:
+                    when_code_dict_week = {'一': 1, '二': 2, '三': 3, '四': 4, '五': 5, '六': 6, '七': 7}
+                    try:
+                        when_code_week = when_code_dict_week[course_when.split('[')[0]]
+                    except KeyError:
+                        raise WrongScheduleException('无法识别部分课程!周次代码错误!')
+                    course_dict = {
+                        'when_code': '0%d%d' % (when_code_week, course_time),
+                        'nickname': translate(single_course_info[0]),
+                        'name': single_course_info[0].split(']')[-1],
+                        'worth': single_course_info[1],
+                        'teacher': single_course_info[9].split(']')[-1],
+                        'week': week_info_to_week_list(single_course_info[12], single_course_info[13]),
+                        'week_raw': single_course_info[12],
+                        'parity': single_course_info[13],
+                        'which_room': single_course_info[15],
+                        'where': None,
+                    }
+                    courses.append(course_dict)
+        return {
+            'department': class_info[1],
+            'grade': None,
+            'major': class_info[2],
+            'class_name': class_info[3],
+            'class_code': class_code,
+            'school_year': str(school_year),
+            'semester': semester,
+            'courses': courses,
+        }
+
+if __name__ == '__main__':
+    sc = ScheduleCatcher()
+    print(json.dumps(sc.get_schedule_form_two('2014020601', 2016, '1')))

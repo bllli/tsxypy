@@ -6,10 +6,10 @@ import bs4
 from tsxypy.SchoolSystem import SchoolSystem
 from tsxypy.Config import Config
 from tsxypy.Exception import NetException, NoneScheduleException, WrongScheduleException
-from tsxypy.Tools import week_info_to_week_list
+from tsxypy.Tools import week_info_to_week_list, translate
 
 
-class ScheduleCatcherTwo(SchoolSystem):
+class ScheduleCatcherFromStuId(SchoolSystem):
     """
     爬取全校教学安排表-学生课表
     通过学号获取课程信息
@@ -86,7 +86,7 @@ class ScheduleCatcherTwo(SchoolSystem):
                         info = '单周'
                     elif info == '双':
                         info = '双周'
-                info = info if len(info) != 0 else None
+                info = info if info is None or len(info) != 0 else None
                 single_course_info.append(info)
                 info_flag += 1
             if len(single_course_info) != 7:
@@ -116,6 +116,7 @@ class ScheduleCatcherTwo(SchoolSystem):
                     raise WrongScheduleException('无法识别部分课程!周次代码错误!')
                 course_dict = {
                     'when_code': '0%d%d' % (when_code_week, course_time),
+                    'nickname': translate(single_course_info[0]),
                     'name': single_course_info[0],
                     'worth': None,
                     'teacher': single_course_info[1],
@@ -139,5 +140,5 @@ class ScheduleCatcherTwo(SchoolSystem):
 
 if __name__ == '__main__':
     import json
-    sct = ScheduleCatcherTwo()
+    sct = ScheduleCatcherFromStuId()
     print(json.dumps(sct.get_schedule('4154001131', 2016, '1')))
