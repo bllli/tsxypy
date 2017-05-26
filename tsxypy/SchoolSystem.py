@@ -53,8 +53,10 @@ class SchoolSystem:
                 # 无须使用本地写权限/不会留下多余的验证码文件
                 # thank to http://stackoverflow.com/questions/31064981/python3-error-initial-value-must-be-str-or-none
                 from io import BytesIO
-                dataBytesIO = BytesIO(img.content)
-                dataBytesIO.seek(0)
+                byteImgIO = BytesIO(img.content)
+                byteImgIO.seek(0)
+                byteImg = byteImgIO.read()
+                dataBytesIO = BytesIO(byteImg)
                 im = Image.open(dataBytesIO)
                 # thanks to http://stackoverflow.com/questions/31077366/pil-cannot-identify-image-file-for-io-bytesio-object
                 text = pytesseract.image_to_string(im)  # 识别图像
