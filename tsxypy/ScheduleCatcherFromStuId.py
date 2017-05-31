@@ -41,7 +41,7 @@ class ScheduleCatcherFromStuId(SchoolSystem):
         person_info = []
         raw_person_info = soup.find('div', {'group': 'group'})
         if not raw_person_info:
-            raise NoneScheduleException("没有课表!")
+            raise NoneScheduleException("课表有误!没有个人信息.")
         for s in raw_person_info.stripped_strings:
             person_info.append(s.split('：')[-1])
         # 检测
@@ -51,7 +51,7 @@ class ScheduleCatcherFromStuId(SchoolSystem):
         # 课程信息处理
         table = soup.find("tbody")
         if table is None:
-            raise NoneScheduleException("没有课表!")
+            raise NoneScheduleException("课表有误!没有课程信息.")
 
         last_course_name = 'error'
         courses = []
