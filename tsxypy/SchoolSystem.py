@@ -55,9 +55,7 @@ class SchoolSystem:
                 from io import BytesIO
                 byteImgIO = BytesIO(img.content)
                 byteImgIO.seek(0)
-                byteImg = byteImgIO.read()
-                dataBytesIO = BytesIO(byteImg)
-                im = Image.open(dataBytesIO)
+                im = Image.open(byteImgIO)
                 # thanks to http://stackoverflow.com/questions/31077366/pil-cannot-identify-image-file-for-io-bytesio-object
                 text = pytesseract.image_to_string(im)  # 识别图像
             return text
