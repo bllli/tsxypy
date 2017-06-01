@@ -2,6 +2,7 @@
 # 为了使实现主要功能的文件更加清爽, 特将几个不涉及对象的工具函数单独提出
 import pickle
 import requests
+from datetime import date
 from tsxypy.Config import Config
 from tsxypy.Exception import WrongScheduleException
 
@@ -99,3 +100,17 @@ def translate(name):
         if key in name:
             return d[key]
     return None
+
+
+def school_year():
+    today = date.today()
+    return today.year if today.month >= 9 else today.year - 1
+
+
+def semester():
+    """
+    钦定一年的9月前未下半学期, 9月后为上半学期
+    :return: '1':下学期, '0':上学期
+    """
+    today = date.today()
+    return '1' if today.month < 9 else '0'
