@@ -19,6 +19,10 @@ class WrongUserCodeException(TsxyException):
     pass
 
 
+class ScoreException(TsxyException):
+    pass
+
+
 class ScheduleException(TsxyException):
     pass
 

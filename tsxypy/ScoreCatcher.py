@@ -3,7 +3,7 @@ from __future__ import absolute_import, division, print_function, unicode_litera
 from tsxypy.SchoolSystem import SchoolSystem
 from tsxypy.Config import Config
 from tsxypy.Tools import this_school_year, this_semester
-from tsxypy.Exception import WrongUserCodeException, NetException, NoneScheduleException, WrongScheduleException
+from tsxypy.Exception import WrongUserCodeException, NetException, ScoreException
 import bs4
 
 
@@ -38,16 +38,18 @@ class ScoreCatcher(SchoolSystem):
         r = self._session.post(url=self._url_score, data=data, headers=self.headers)
         if not r.status_code == 200:
             raise NetException("课表获取失败!")
+        if '没有检索到记录' in r.text:
+            raise ScoreException("还没出新课表呢")
         soup = bs4.BeautifulSoup(r.text.strip(), 'html.parser')
         person_info = []
         raw_person_info = soup.find('div', {'group': 'group'})
         if not raw_person_info:
-            raise NoneScheduleException("课表有误!没有个人信息.")
+            raise ScoreException("课表有误!没有个人信息.")
         for s in raw_person_info.stripped_strings:
             person_info.append(s.split('：')[-1])
         # 检测
         if person_info[2] != stu_id:
-            raise WrongScheduleException('获取到的课表信息不符')
+            raise WrongUserCodeException('获取到的课表信息不符')
 
         tables = soup.find_all('table')
         score_tables = []
