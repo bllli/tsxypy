@@ -6,11 +6,7 @@ setup(
     keywords=('Python3', 'TSXY'),
     description='',
     license='MIT License',
-    install_requires=['beautifulsoup4>=4.5.3',
-                      'bs4>=0.0.1',
-                      'Pillow>=4.1.0',
-                      'pytesseract>=0.1.6',
-                      'requests>=2.13.0'],
+    install_requires=[],
     author='bllli',
     author_email='hello@bllli.cn',
 

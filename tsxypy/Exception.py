@@ -7,6 +7,10 @@ class TsxyException(Exception):
         return repr(self.value)
 
 
+class LoginException(TsxyException):
+    pass
+
+
 class WrongPasswordException(TsxyException):
     pass
 

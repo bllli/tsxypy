@@ -4,6 +4,7 @@ from tsxypy.Config import Config
 from tsxypy.SchoolSystem import SchoolSystem
 from tsxypy.ScoreCatcher import ScoreCatcher
 from tsxypy.ScheduleCatcher import ScheduleCatcher
+from tsxypy.Exception import LoginException
 
 
 def is_tsxy_stu(stu, pwd):
@@ -17,12 +18,24 @@ def is_tsxy_stu(stu, pwd):
     try:
         int(stu)
     except ValueError:
-        raise ValueError('学号应该是一个十位数或是九位数.')
+        raise LoginException('学号应该是一个十位数或是九位数.')
     if len(stu) not in [9, 10]:
-        raise ValueError('学号应该是一个十位数或是九位数.')
+        raise LoginException('学号应该是一个十位数或是九位数.')
     stu = SchoolSystem(stu=stu, pwd=pwd, use_cookies=False)
     stu.login()
     return stu.get_user_code()
+
+
+def is_tsxy_teacher(teacher, pwd):
+    try:
+        if teacher[0] not in ['t', 'T']:
+            raise LoginException('教师公号首位应为t')
+        int(teacher[1:])
+    except ValueError:
+        raise LoginException('教师工号有误！')
+    teacher = SchoolSystem(stu=teacher, pwd=pwd, use_cookies=False)
+    teacher.login()
+    return teacher.get_user_code()
 
 
 def get_user_info_by_user_code(user_code):

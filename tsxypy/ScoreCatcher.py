@@ -39,7 +39,7 @@ class ScoreCatcher(SchoolSystem):
         if not r.status_code == 200:
             raise NetException("课表获取失败!")
         if '没有检索到记录' in r.text:
-            raise ScoreException("还没出新课表呢")
+            raise ScoreException("还没出成绩呢")
         soup = bs4.BeautifulSoup(r.text.strip(), 'html.parser')
         person_info = []
         raw_person_info = soup.find('div', {'group': 'group'})
