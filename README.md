@@ -40,7 +40,7 @@ Ubuntu中使用`sudo apt-get install tesseract-ocr`安装即可
 
 # 测试
 ```
-python -m unittest discover -s /path/to/tsxyScore/tests -v -f
+python -m unittest discover -s tests -v -f
 ```
 
 # QA

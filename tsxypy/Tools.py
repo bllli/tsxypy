@@ -1,31 +1,28 @@
 # -*- coding: utf-8 -*-
 # 为了使实现主要功能的文件更加清爽, 特将几个不涉及对象的工具函数单独提出
+import hashlib
 import pickle
+from base64 import b64encode
+
 import requests
 from datetime import date
 from tsxypy.Config import Config
 from tsxypy.Exception import WrongScheduleException
 
 
-def md5password(password, rand_number):
-    """
-    获取经password/验证码混合加密所得的password
-    该”加密算法“来自官网登录页的JS脚本
-    ###感谢师兄 旺哥将其翻译成了py版本###
-        我以为js加法是16进制直接相加- -
-        害得我在py里把两个16进制的转成10进制相加后再转成16进制- -
-        马丹原来加号就是连接字符串啊- -
-    :param password: 用户密码
-    :param rand_number: 验证码
-    :return: 登陆所需的已加密密码
-    """
-    def md5_encode(string):
-        import hashlib
-        m = hashlib.md5(string.encode(encoding='utf-8'))
-        return m.hexdigest()
-
-    password = md5_encode(md5_encode(password) + md5_encode(rand_number))
-    return password
+def gen_login_params(user_name, pwd, session_id, rand_number):
+    def md5password(password, rand_number):
+        def md5_encode(string):
+            m = hashlib.md5(string.encode(encoding='utf-8'))
+            return m.hexdigest()
+        return md5_encode(md5_encode(password) + md5_encode(rand_number))
+    p_username = "_u" + rand_number
+    p_password = "_p" + rand_number
+    pwd = md5password(pwd, rand_number)
+    __ = user_name + ";;" + session_id
+    user_name = b64encode(__.encode()).decode()
+    params = p_username + "=" + user_name + "&" + p_password + "=" + pwd + "&randnumber=" + rand_number + "&isPasswordPolicy=1"
+    return params
 
 
 def rand_ok(rand_text):

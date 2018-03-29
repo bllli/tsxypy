@@ -138,7 +138,8 @@ class ScheduleCatcherFromStuId(SchoolSystem):
             'courses': courses,
         }
 
+
 if __name__ == '__main__':
     import json
     sct = ScheduleCatcherFromStuId()
-    print(json.dumps(sct.get_schedule('4154001131', 2016, '1')))
+    print(json.dumps(sct.get_schedule('4154001131', 2017, '0')))

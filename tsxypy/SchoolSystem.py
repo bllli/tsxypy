@@ -11,7 +11,7 @@ from datetime import datetime
 from PIL import Image
 
 from tsxypy.Config import Config
-from tsxypy.Tools import md5password, rand_ok, save_cookies, load_cookies
+from tsxypy.Tools import md5password, rand_ok, save_cookies, load_cookies, gen_login_params
 from tsxypy.Exception import WrongPasswordException
 
 
@@ -29,6 +29,9 @@ class SchoolSystem:
 
         self.headers = {
             'Referer': 'http://jiaowu.tsc.edu.cn/tscjw/cas/login.action',
+            'Host': 'jiaowu.tsc.edu.cn',
+            'Origin': 'http://jiaowu.tsc.edu.cn',
+            'User-Agent': 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/63.0.3239.132 Safari/537.36',
         }
         if use_cookies:
             self.cookies_login()
@@ -61,24 +64,19 @@ class SchoolSystem:
             return text
 
         rand_number = get_rand()
-        password = md5password(self._pwd, rand_number)
         # 登陆提交的信息
-        data = {
-            'username': self._stu,
-            'password': password,
-            'randnumber': rand_number,
-            'isPasswordPolicy': 1
-        }
-        r = self._session.post(url=self._url_login, data=data, headers=self.headers)
+        params = gen_login_params(self._stu, self._pwd, self._session.cookies.get('JSESSIONID'), rand_number)
+        r = self._session.get(url=self._url_login, params=params, headers=self.headers)
         # 200 成功
         # 401 验证码有误
         # 402 账号或密码有误
+        # 5000
         response = json.loads(r.content.decode('utf-8'))
         status = response['status']
-        if status == '401':
-            self.login()
-        elif status == '402':
+        if status == '402':
             raise WrongPasswordException('402, 账号或密码错误')
+        elif status != '200':
+            self.login()
         save_cookies(self._session.cookies)
 
     def cookies_login(self):

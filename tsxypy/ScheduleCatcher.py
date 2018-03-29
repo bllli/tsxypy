@@ -334,6 +334,7 @@ class ScheduleCatcher(SchoolSystem):
             'courses': courses,
         }
 
+
 if __name__ == '__main__':
     sc = ScheduleCatcher()
     print(json.dumps(sc.get_schedule_form_two('2014020601', 2016, '1')))
